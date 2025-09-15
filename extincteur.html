@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Extincteur - Parc Incendie</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>🚒<br>Parc Incendie</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="dashbord.html#dashboard" class="nav-link">Tableau de bord</a></li>
+          <li><a href="horsforfait.html" class="nav-link">Hors Forfait</a></li>
+          <li><a href="ari.html" class="nav-link">ARI</a></li>
+          <li><a href="extincteur.html" class="nav-link active">Extincteur</a></li>
+          <li><a href="budget.html" class="nav-link">Budget</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <small>© 2025</small>
+      </div>
+    </aside>
+    <main class="container">
+      <section class="page-section">
+        <h2>🧯 Extincteur</h2>
+        <div class="upload-box">
+          <p>📥 Importer le fichier <strong>Extincteurs.xlsx</strong> :</p>
+          <input type="file" id="inputExcelExtincteur" accept=".xlsx,.xls" />
+        </div>
+        <div class="photo-upload-box">
+          <p>🖼️ Ajouter une photo de l'extincteur :</p>
+          <input type="file" id="inputPhotoExtincteur" accept="image/*" />
+          <div id="photoPreviewExtincteur" style="margin-top:1rem;"></div>
+        </div>
+        <div id="extincteurTableContainer">
+          <!-- Tableau des extincteurs à générer dynamiquement, avec colonne photo -->
+        </div>
+        <template id="photoCellTemplate">
+          <input type="file" accept="image/*" class="photo-upload-per-row" style="display:block;margin:auto;" />
+          <div class="photo-preview-per-row" style="margin-top:0.5rem;text-align:center;"></div>
+        </template>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

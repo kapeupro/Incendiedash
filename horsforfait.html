@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hors Forfait - Parc Incendie</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>🚒<br>Parc Incendie</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="dashbord.html#dashboard" class="nav-link">Tableau de bord</a></li>
+          <li><a href="horsforfait.html" class="nav-link active">Hors Forfait</a></li>
+          <li><a href="ari.html" class="nav-link">ARI</a></li>
+          <li><a href="extincteur.html" class="nav-link">Extincteur</a></li>
+          <li><a href="budget.html" class="nav-link">Budget</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <small>© 2025</small>
+      </div>
+    </aside>
+    <main class="container">
+      <section class="page-section">
+        <h2>🚧 Hors Forfait</h2>
+        <form id="horsForfaitForm" class="horsforfait-form" autocomplete="off" style="margin-bottom:2rem;">
+          <label for="typeVehicule">Type de véhicule :</label>
+          <input type="text" id="typeVehicule" required placeholder="Ex : Camion citerne" />
+          <label for="prixHorsForfait" style="margin-left:1rem;">Prix du hors forfait (€) :</label>
+          <input type="number" id="prixHorsForfait" required min="0" step="0.01" placeholder="Ex : 1500" />
+          <button type="submit" style="margin-left:1rem;">Ajouter</button>
+        </form>
+        <div id="horsForfaitTableContainer">
+          <!-- Tableau des véhicules hors forfait à générer dynamiquement -->
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

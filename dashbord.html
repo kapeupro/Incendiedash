@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Parc Incendie</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>🚒<br>Parc Incendie</h1>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#dashboard" class="nav-link" id="nav-dashboard"><strong>Tableau de bord</strong></a></li>
+          <li><a href="#horsforfait" class="nav-link" id="nav-horsforfait">Hors Forfait</a></li>
+          <li><a href="#ari" class="nav-link" id="nav-ari">ARI</a></li>
+          <li><a href="#extincteur" class="nav-link" id="nav-extincteur">Extincteur</a></li>
+          <li><a href="#budget" class="nav-link" id="nav-budget">Budget</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <small>© 2025</small>
+      </div>
+    </aside>
+    <main class="container">
+      <section id="page-dashboard">
+        <div class="upload-box">
+          <p>📥 Importer le fichier <strong>Parc_Incendie_Clean.xlsx</strong> :</p>
+          <input type="file" id="inputExcel" accept=".xlsx,.xls" />
+        </div>
+
+        <div id="summaryBox">
+          <div class="summary-item">
+            <img src="assets/logo-armee-air.png" alt="Armée de l'air">
+            <div id="count-air">✈️ Armée de l'air : 0</div>
+          </div>
+          <div class="summary-item">
+            <img src="assets/logo-marine.png" alt="Marine Nationale">
+            <div id="count-navy">🚢 Marine nationale : 0</div>
+          </div>
+          <div class="summary-item">
+            <img src="assets/logo-armee-terre.png" alt="Armée de Terre">
+            <div id="count-army">🪖 Armée de terre : 0</div>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <label for="filterCorps">Filtrer par Corps d'Armée :</label>
+          <select id="filterCorps">
+            <option value="">-- Tous --</option>
+            <option value="Armée de Terre">Armée de Terre</option>
+            <option value="Armée de l'Air">Armée de l'Air</option>
+            <option value="Marine Nationale">Marine Nationale</option>
+          </select>
+          <label for="tableSearch" style="margin-left:2rem;">🔎 Rechercher :</label>
+          <input type="text" id="tableSearch" placeholder="Recherche dans le tableau..." style="min-width:220px;" />
+        </div>
+
+        <button id="exportExcelBtn" class="export-btn" style="margin-bottom:1.5rem;">⬇️ Exporter Excel</button>
+        <div id="map"></div>
+
+        <table id="vehicleTable">
+          <thead>
+            <tr>
+              <th>Immatriculation</th>
+              <th>Type</th>
+              <th>Corps d'Armée</th>
+              <th>Statut</th>
+              <th>Localisation</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+      <section id="page-horsforfait" class="page-section" style="display:none">
+        <h2>🚧 Hors Forfait</h2>
+        <div class="page-placeholder">Aucune donnée hors forfait pour le moment.<br>Ajoutez ou gérez vos éléments ici.</div>
+      </section>
+      <section id="page-ari" class="page-section" style="display:none">
+        <h2>🫁 ARI</h2>
+        <div class="page-placeholder">Gestion des ARI (Appareils Respiratoires Isolants).<br>À personnaliser selon vos besoins.</div>
+      </section>
+      <section id="page-extincteur" class="page-section" style="display:none">
+        <h2>🧯 Extincteur</h2>
+        <div id="dashboardExtincteurTableContainer">
+          <!-- Tableau extincteur avec photo, alimenté dynamiquement -->
+        </div>
+      </section>
+      <section id="page-budget" class="page-section" style="display:none">
+        <h2>💶 Budget</h2>
+        <div class="page-placeholder">Suivi et gestion du budget.<br>À personnaliser selon vos besoins.</div>
+      </section>
+    </main>

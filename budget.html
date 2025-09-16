@@ -2,34 +2,205 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Budget - Parc Incendie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget - Parc Incendie - SIMMT</title>
+  <meta name="description" content="Analyse budgétaire et financière du parc incendie">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Custom Styles -->
   <link rel="stylesheet" href="assets/style.css" />
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="assets/data-manager.js"></script>
+  <script src="assets/mobile-menu.js"></script>
 </head>
 <body>
+
+  <!-- Menu hamburger pour mobile -->
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay pour mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="main-layout">
-    <aside class="sidebar">
+    <aside class="sidebar collapsed" id="sidebar">
       <div class="sidebar-header">
-        <h1>🚒<br>Parc Incendie</h1>
+        <img src="assets/logo-simmt.png" alt="Logo SIMMT">
+        <h1>Parc Incendie</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="dashbord.html#dashboard" class="nav-link">Tableau de bord</a></li>
-          <li><a href="horsforfait.html" class="nav-link">Hors Forfait</a></li>
-          <li><a href="ari.html" class="nav-link">ARI</a></li>
-          <li><a href="extincteur.html" class="nav-link">Extincteur</a></li>
-          <li><a href="budget.html" class="nav-link active">Budget</a></li>
+          <li><a href="dashbord.html#dashboard" class="nav-link" id="nav-dashboard" data-tooltip="Tableau de bord">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Tableau de bord</span>
+          </a></li>
+          <li><a href="horsforfait.html" class="nav-link" id="nav-horsforfait" data-tooltip="Hors Forfait">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Hors Forfait</span>
+          </a></li>
+          <li><a href="ari.html" class="nav-link" id="nav-ari" data-tooltip="ARI">
+            <i class="fas fa-lungs"></i>
+            <span>ARI</span>
+          </a></li>
+          <li><a href="extincteur.html" class="nav-link" id="nav-extincteur" data-tooltip="Extincteur">
+            <i class="fas fa-fire-extinguisher"></i>
+            <span>Extincteur</span>
+          </a></li>
+          <li><a href="budget.html" class="nav-link active" id="nav-budget" data-tooltip="Budget">
+            <i class="fas fa-euro-sign"></i>
+            <strong>Budget</strong>
+          </a></li>
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <small>© 2025</small>
+        <small><i class="fas fa-copyright"></i> 2025 SIMMT</small>
       </div>
     </aside>
+    
     <main class="container">
-      <section class="page-section">
-        <h2>💶 Budget</h2>
-        <div class="page-placeholder">Suivi et gestion du budget.<br>À personnaliser selon vos besoins.</div>
-      </section>
+      <!-- Header du budget -->
+      <div class="dashboard-header">
+        <h1><i class="fas fa-chart-line"></i> Analyse Budgétaire - Parc Incendie</h1>
+        <p class="dashboard-subtitle">Suivi financier et analyse des coûts par équipement et corps d'armée</p>
+      </div>
+
+      <!-- Zone d'import de fichier -->
+      <div class="upload-box">
+        <div class="upload-content">
+          <i class="fas fa-file-excel upload-icon"></i>
+          <p><strong>Les données sont synchronisées automatiquement</strong></p>
+          <p class="upload-description">Importez un fichier Excel depuis n'importe quelle page pour alimenter les graphiques</p>
+        </div>
+        <div id="budgetImportContainer"></div>
+      </div>
+
+      <!-- Indicateurs financiers principaux -->
+      <div id="budgetSummary" class="budget-summary">
+        <div class="budget-card">
+          <div class="budget-icon">
+            <i class="fas fa-euro-sign"></i>
+          </div>
+          <div class="budget-info">
+            <h3>Budget Total</h3>
+            <div class="budget-amount" id="totalBudget">0 €</div>
+            <div class="budget-label">Tous équipements</div>
+          </div>
+        </div>
+        <div class="budget-card">
+          <div class="budget-icon">
+            <i class="fas fa-calculator"></i>
+          </div>
+          <div class="budget-info">
+            <h3>Coût Moyen</h3>
+            <div class="budget-amount" id="avgCost">0 €</div>
+            <div class="budget-label">Par équipement</div>
+          </div>
+        </div>
+        <div class="budget-card">
+          <div class="budget-icon">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div class="budget-info">
+            <h3>Plus Coûteux</h3>
+            <div class="budget-amount" id="maxCost">0 €</div>
+            <div class="budget-label">Équipement le plus cher</div>
+          </div>
+        </div>
+        <div class="budget-card">
+          <div class="budget-icon">
+            <i class="fas fa-hashtag"></i>
+          </div>
+          <div class="budget-info">
+            <h3>Total Équipements</h3>
+            <div class="budget-amount" id="totalEquipments">0</div>
+            <div class="budget-label">Unités recensées</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphiques -->
+      <div class="charts-grid">
+        <!-- Graphique en secteurs - Budget par Corps d'Armée -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-pie"></i> Répartition Budgétaire par Corps d'Armée</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="budgetByCorpsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Graphique en barres - Coût par Type d'Équipement -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-bar"></i> Coût Moyen par Type d'Équipement</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="costByTypeChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Graphique linéaire - Évolution des Coûts -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-line"></i> Analyse des Coûts par Localisation</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="costByLocationChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Graphique radar - Comparaison Corps d'Armée -->
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-area"></i> Comparaison Multi-Critères</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="radarChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau détaillé des coûts -->
+      <div class="table-container">
+        <div class="table-header">
+          <h3><i class="fas fa-table"></i> Détail des Coûts par Équipement</h3>
+          <button id="exportBudgetBtn" class="export-btn">
+            <i class="fas fa-download"></i>
+            Exporter Analyse
+          </button>
+        </div>
+        <table id="budgetTable">
+          <thead>
+            <tr>
+              <th><i></i> Bon de Commande</th>
+              <th><i></i> Ligne Budgétaire</th>
+              <th><i></i> Montant</th>
+              <th><i></i> Date d'Acquisition</th>
+              <th><i></i> Intitulé Commande</th>
+              <th><i></i> Statut</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </main>
+
+    <!-- Scripts -->
+    <script src="assets/budget.js"></script>
   </div>
 </body>
 </html>

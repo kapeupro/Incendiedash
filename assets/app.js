@@ -78,30 +78,31 @@ if (document.getElementById('horsForfaitForm')) {
     container.innerHTML = html;
   }
 }
-// Navigation multi-pages
-const pages = [
-  { hash: '#dashboard', section: 'page-dashboard' },
-  { hash: '#horsforfait', section: 'page-horsforfait' },
-  { hash: '#ari', section: 'page-ari' },
-  { hash: '#extincteur', section: 'page-extincteur' },
-  { hash: '#budget', section: 'page-budget' }
-];
-
-function showPageFromHash() {
-  const hash = window.location.hash || '#dashboard';
-  pages.forEach(({ hash: h, section }) => {
-    const el = document.getElementById(section);
-    if (el) el.style.display = (h === hash) ? '' : 'none';
+// Navigation pour le dashboard uniquement
+function initDashboardNavigation() {
+  // Afficher seulement la section dashboard
+  const dashboardSection = document.getElementById('page-dashboard');
+  if (dashboardSection) {
+    dashboardSection.style.display = 'block';
+  }
+  
+  // Cacher les autres sections (si elles existent)
+  const otherSections = ['page-horsforfait', 'page-ari', 'page-extincteur', 'page-budget'];
+  otherSections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.style.display = 'none';
+    }
   });
-  // Activer le lien courant
-  document.querySelectorAll('.nav-link').forEach(link => {
-    if (link.getAttribute('href') === hash) link.classList.add('active');
-    else link.classList.remove('active');
-  });
+  
+  // Marquer le lien dashboard comme actif
+  const dashboardLink = document.getElementById('nav-dashboard');
+  if (dashboardLink) {
+    dashboardLink.classList.add('active');
+  }
 }
 
-window.addEventListener('hashchange', showPageFromHash);
-window.addEventListener('DOMContentLoaded', showPageFromHash);
+window.addEventListener('DOMContentLoaded', initDashboardNavigation);
 // Export Excel
 document.getElementById('exportExcelBtn').addEventListener('click', function () {
   if (!allData || allData.length === 0) {
@@ -175,8 +176,27 @@ function renderData(data) {
 
       if (iconUrl) {
         const icon = L.icon({ iconUrl, iconSize: [38, 38], className: 'marker-logo' });
-        L.marker(latLng, { icon }).addTo(map)
-          .bindPopup(`<strong>${row.Type}</strong><br>${row["Corps Armée"]}<br>${row.Localisation}`);
+        const marker = L.marker(latLng, { icon });
+        
+        // Utiliser le nouveau système de popups modernes
+        const equipment = {
+          Immatriculation: row.Immatriculation || 'N/A',
+          Type: row.Type || 'Non spécifié',
+          'Corps d\'Armée': row["Corps Armée"] || 'Non spécifié',
+          Localisation: row.Localisation || 'Non spécifiée',
+          Statut: row.Statut || 'Actif',
+          Latitude: row.Latitude,
+          Longitude: row.Longitude
+        };
+        
+        const popupContent = popupManager.createBudgetPopup(equipment);
+        marker.bindPopup(popupContent, {
+          maxWidth: 320,
+          minWidth: 280,
+          className: 'modern-popup'
+        });
+        
+        marker.addTo(map);
       }
     }
   });

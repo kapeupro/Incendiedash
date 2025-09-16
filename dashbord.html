@@ -2,100 +2,267 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Parc Incendie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Parc Incendie - SIMMT</title>
+  <meta name="description" content="Tableau de bord moderne pour la gestion du parc incendie">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- External Libraries -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Custom Styles -->
   <link rel="stylesheet" href="assets/style.css" />
+  
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="assets/data-manager.js"></script>
+  <script src="assets/popup-manager.js"></script>
+  <script src="assets/mobile-menu.js"></script>
 </head>
 <body>
 
+  <!-- Menu hamburger pour mobile -->
+  <button class="mobile-menu-toggle" id="mobileMenuToggle">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay pour mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <div class="main-layout">
-    <aside class="sidebar">
+    <aside class="sidebar collapsed" id="sidebar">
       <div class="sidebar-header">
-        <h1>🚒<br>Parc Incendie</h1>
+        <img src="assets/logo-simmt.png" alt="Logo SIMMT">
+        <h1>Parc Incendie</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="#dashboard" class="nav-link" id="nav-dashboard"><strong>Tableau de bord</strong></a></li>
-          <li><a href="#horsforfait" class="nav-link" id="nav-horsforfait">Hors Forfait</a></li>
-          <li><a href="#ari" class="nav-link" id="nav-ari">ARI</a></li>
-          <li><a href="#extincteur" class="nav-link" id="nav-extincteur">Extincteur</a></li>
-          <li><a href="#budget" class="nav-link" id="nav-budget">Budget</a></li>
+          <li><a href="dashbord.html" class="nav-link active" id="nav-dashboard" data-tooltip="Tableau de bord">
+            <i class="fas fa-tachometer-alt"></i>
+            <strong>Tableau de bord</strong>
+          </a></li>
+          <li><a href="horsforfait.html" class="nav-link" id="nav-horsforfait" data-tooltip="Hors Forfait">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Hors Forfait</span>
+          </a></li>
+          <li><a href="ari.html" class="nav-link" id="nav-ari" data-tooltip="ARI">
+            <i class="fas fa-lungs"></i>
+            <span>ARI</span>
+          </a></li>
+          <li><a href="extincteur.html" class="nav-link" id="nav-extincteur" data-tooltip="Extincteur">
+            <i class="fas fa-fire-extinguisher"></i>
+            <span>Extincteur</span>
+          </a></li>
+          <li><a href="budget.html" class="nav-link" id="nav-budget" data-tooltip="Budget">
+            <i class="fas fa-euro-sign"></i>
+            <span>Budget</span>
+          </a></li>
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <small>© 2025</small>
+        <small><i class="fas fa-copyright"></i> 2025 SIMMT</small>
       </div>
     </aside>
     <main class="container">
       <section id="page-dashboard">
+        <!-- Header avec titre et actions -->
+        <div class="dashboard-header">
+          <h1><i class="fas fa-fire-flame-curved"></i> Tableau de Bord - Parc Incendie</h1>
+          <p class="dashboard-subtitle">Gestion et suivi en temps réel des équipements de sécurité incendie</p>
+        </div>
+
+        <!-- Zone d'import de fichier -->
         <div class="upload-box">
-          <p>📥 Importer le fichier <strong>Parc_Incendie_Clean.xlsx</strong> :</p>
+          <div class="upload-content">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p><strong>Importer le fichier Parc_Incendie_Clean.xlsx</strong></p>
+            <p class="upload-description">Glissez-déposez votre fichier ou cliquez pour sélectionner</p>
+          </div>
           <input type="file" id="inputExcel" accept=".xlsx,.xls" />
         </div>
 
+        <!-- Statistiques par corps d'armée -->
         <div id="summaryBox">
           <div class="summary-item">
-            <img src="assets/logo-armee-air.png" alt="Armée de l'air">
-            <div id="count-air">✈️ Armée de l'air : 0</div>
+            <div class="summary-icon">
+              <i class="fas fa-plane"></i>
+            </div>
+            <img src="assets/logo-armee-air.png" alt="Armée de l'air" loading="lazy">
+            <div class="summary-content">
+              <div class="summary-title">Armée de l'Air</div>
+              <div class="summary-count" id="count-air">0</div>
+              <div class="summary-label">équipements</div>
+            </div>
           </div>
           <div class="summary-item">
-            <img src="assets/logo-marine.png" alt="Marine Nationale">
-            <div id="count-navy">🚢 Marine nationale : 0</div>
+            <div class="summary-icon">
+              <i class="fas fa-anchor"></i>
+            </div>
+            <img src="assets/logo-marine.png" alt="Marine Nationale" loading="lazy">
+            <div class="summary-content">
+              <div class="summary-title">Marine Nationale</div>
+              <div class="summary-count" id="count-navy">0</div>
+              <div class="summary-label">équipements</div>
+            </div>
           </div>
           <div class="summary-item">
-            <img src="assets/logo-armee-terre.png" alt="Armée de Terre">
-            <div id="count-army">🪖 Armée de terre : 0</div>
+            <div class="summary-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <img src="assets/logo-armee-terre.png" alt="Armée de Terre" loading="lazy">
+            <div class="summary-content">
+              <div class="summary-title">Armée de Terre</div>
+              <div class="summary-count" id="count-army">0</div>
+              <div class="summary-label">équipements</div>
+            </div>
           </div>
         </div>
 
+        <!-- Filtres et recherche -->
         <div class="filter-box">
-          <label for="filterCorps">Filtrer par Corps d'Armée :</label>
-          <select id="filterCorps">
-            <option value="">-- Tous --</option>
-            <option value="Armée de Terre">Armée de Terre</option>
-            <option value="Armée de l'Air">Armée de l'Air</option>
-            <option value="Marine Nationale">Marine Nationale</option>
-          </select>
-          <label for="tableSearch" style="margin-left:2rem;">🔎 Rechercher :</label>
-          <input type="text" id="tableSearch" placeholder="Recherche dans le tableau..." style="min-width:220px;" />
+          <div class="filter-group">
+            <label for="filterCorps">
+              <i class="fas fa-filter"></i>
+              Filtrer par Corps d'Armée
+            </label>
+            <select id="filterCorps">
+              <option value="">-- Tous les corps d'armée --</option>
+              <option value="Armée de Terre">Armée de Terre</option>
+              <option value="Armée de l'Air">Armée de l'Air</option>
+              <option value="Marine Nationale">Marine Nationale</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="tableSearch">
+              <i class="fas fa-search"></i>
+              Rechercher
+            </label>
+            <input type="text" id="tableSearch" placeholder="Recherche dans le tableau..." />
+          </div>
         </div>
 
-        <button id="exportExcelBtn" class="export-btn" style="margin-bottom:1.5rem;">⬇️ Exporter Excel</button>
-        <div id="map"></div>
+        <!-- Actions et export -->
+        <div class="actions-bar">
+          <div class="actions-left">
+            <div id="universalImportContainer"></div>
+          </div>
+          <div class="actions-right">
+            <button id="exportExcelBtn" class="export-btn">
+              <i class="fas fa-download"></i>
+              Exporter Excel
+            </button>
+            <div class="actions-info">
+              <span id="tableCount">0 équipements affichés</span>
+            </div>
+          </div>
+        </div>
 
-        <table id="vehicleTable">
-          <thead>
-            <tr>
-              <th>Immatriculation</th>
-              <th>Type</th>
-              <th>Corps d'Armée</th>
-              <th>Statut</th>
-              <th>Localisation</th>
-              <th>Latitude</th>
-              <th>Longitude</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <!-- Carte interactive -->
+        <div class="map-container">
+          <div class="map-header">
+            <h3><i class="fas fa-map-marked-alt"></i> Localisation des équipements</h3>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <!-- Tableau des données -->
+        <div class="table-container">
+          <div class="table-header">
+            <h3><i class="fas fa-table"></i> Liste des équipements</h3>
+          </div>
+          <table id="vehicleTable">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> Immatriculation</th>
+                <th><i class="fas fa-tag"></i> Type</th>
+                <th><i class="fas fa-flag"></i> Corps d'Armée</th>
+                <th><i class="fas fa-info-circle"></i> Statut</th>
+                <th><i class="fas fa-map-marker-alt"></i> Localisation</th>
+                <th><i class="fas fa-compass"></i> Latitude</th>
+                <th><i class="fas fa-compass"></i> Longitude</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </section>
+
+      <!-- Section Hors Forfait -->
       <section id="page-horsforfait" class="page-section" style="display:none">
-        <h2>🚧 Hors Forfait</h2>
-        <div class="page-placeholder">Aucune donnée hors forfait pour le moment.<br>Ajoutez ou gérez vos éléments ici.</div>
-      </section>
-      <section id="page-ari" class="page-section" style="display:none">
-        <h2>🫁 ARI</h2>
-        <div class="page-placeholder">Gestion des ARI (Appareils Respiratoires Isolants).<br>À personnaliser selon vos besoins.</div>
-      </section>
-      <section id="page-extincteur" class="page-section" style="display:none">
-        <h2>🧯 Extincteur</h2>
-        <div id="dashboardExtincteurTableContainer">
-          <!-- Tableau extincteur avec photo, alimenté dynamiquement -->
+        <h2><i class="fas fa-exclamation-triangle"></i> Hors Forfait</h2>
+        <div class="page-placeholder">
+          <i class="fas fa-clipboard-list placeholder-icon"></i>
+          <h3>Aucune donnée hors forfait</h3>
+          <p>Les équipements hors forfait apparaîtront ici.<br>Ajoutez ou gérez vos éléments selon vos besoins.</p>
         </div>
       </section>
+
+      <!-- Section ARI -->
+      <section id="page-ari" class="page-section" style="display:none">
+        <h2><i class="fas fa-lungs"></i> ARI - Appareils Respiratoires Isolants</h2>
+        <div class="page-placeholder">
+          <i class="fas fa-hard-hat placeholder-icon"></i>
+          <h3>Gestion des ARI</h3>
+          <p>Module de gestion des Appareils Respiratoires Isolants.<br>Fonctionnalités à personnaliser selon vos besoins spécifiques.</p>
+        </div>
+      </section>
+
+      <!-- Section Extincteur -->
+      <section id="page-extincteur" class="page-section" style="display:none">
+        <h2><i class="fas fa-fire-extinguisher"></i> Extincteurs</h2>
+        <div id="dashboardExtincteurTableContainer">
+          <div class="page-placeholder">
+            <i class="fas fa-fire-extinguisher placeholder-icon"></i>
+            <h3>Gestion des extincteurs</h3>
+            <p>Le tableau des extincteurs sera alimenté dynamiquement.<br>Importez vos données pour commencer.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Budget -->
       <section id="page-budget" class="page-section" style="display:none">
-        <h2>💶 Budget</h2>
-        <div class="page-placeholder">Suivi et gestion du budget.<br>À personnaliser selon vos besoins.</div>
+        <h2><i class="fas fa-euro-sign"></i> Budget</h2>
+        <div class="page-placeholder">
+          <i class="fas fa-chart-line placeholder-icon"></i>
+          <h3>Suivi budgétaire</h3>
+          <p>Tableau de bord financier pour le suivi et la gestion du budget.<br>Module à personnaliser selon vos besoins comptables.</p>
+        </div>
       </section>
     </main>
+
+    <!-- Scripts -->
+    <script src="assets/app.js"></script>
+    <script>
+      // Initialisation du système d'import universel pour le dashboard
+      document.addEventListener('DOMContentLoaded', function() {
+        // Créer le bouton d'import universel
+        createUniversalFileInput('universalImportContainer', 'Importer Données Excel', 'dashboard');
+        
+        // Écouter les mises à jour de données
+        window.addEventListener('dataUpdated', function(e) {
+          console.log('Données mises à jour depuis le dashboard');
+          // Recharger les données si nécessaire
+          if (typeof loadVehicleData === 'function') {
+            const data = dataManager.getData();
+            loadVehicleData(data);
+          }
+        });
+        
+        // Charger les données existantes au démarrage
+        const existingData = dataManager.getData();
+        if (existingData.length > 0 && typeof loadVehicleData === 'function') {
+          loadVehicleData(existingData);
+        }
+      });
+    </script>
+  </body>
+</html>
